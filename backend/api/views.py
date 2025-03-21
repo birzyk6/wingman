@@ -19,7 +19,7 @@ def generate_response(request):
 
     try:
         response = requests.post(
-            "http://127.0.0.1:11434/api/generate",
+            "http://localhost:11434/api/generate",
             json=payload,
             timeout=30,  # Increased timeout
         )

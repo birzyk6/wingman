@@ -24,7 +24,7 @@ export default function Home() {
         const fetchPreviousResponses = async () => {
             setFetchingHistory(true);
             try {
-                const res = await axios.get("http://127.0.0.1:8000/api/responses/");
+                const res = await axios.get("http://localhost:8000/api/responses/");
                 setPreviousResponses(res.data);
             } catch (err) {
                 console.error("Failed to fetch previous responses:", err);
@@ -43,11 +43,11 @@ export default function Home() {
         setError("");
 
         try {
-            const res = await axios.post("http://127.0.0.1:8000/api/generate/", { prompt });
+            const res = await axios.post("http://localhost:8000/api/generate/", { prompt });
             setResponse(res.data.response);
 
             // Refresh the list of previous responses after successful generation
-            const historyRes = await axios.get("http://127.0.0.1:8000/api/responses/");
+            const historyRes = await axios.get("http://localhost:8000/api/responses/");
             setPreviousResponses(historyRes.data);
         } catch (err) {
             console.error("Error:", err);
