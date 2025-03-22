@@ -18,6 +18,7 @@ export default function Home() {
     const [error, setError] = useState("");
     const [previousResponses, setPreviousResponses] = useState<ResponseData[]>([]);
     const [fetchingHistory, setFetchingHistory] = useState(false);
+    const [streaming, setStreaming] = useState(false);
 
     // Fetch previous responses on component mount
     useEffect(() => {
@@ -40,15 +41,68 @@ export default function Home() {
         if (!prompt.trim()) return;
 
         setLoading(true);
+        setStreaming(true);
         setError("");
+        setResponse(""); // Clear previous response
 
         try {
-            const res = await axios.post("http://localhost:8000/api/generate/", { prompt });
-            setResponse(res.data.response);
+            // For streaming, we'll use the Fetch API directly instead of axios
+            const response = await fetch("http://localhost:8000/api/generate/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ prompt, stream: true }),
+            });
 
-            // Refresh the list of previous responses after successful generation
-            const historyRes = await axios.get("http://localhost:8000/api/responses/");
-            setPreviousResponses(historyRes.data);
+            if (!response.ok) {
+                throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
+            }
+
+            // Handle the event stream
+            const reader = response.body?.getReader();
+            if (!reader) {
+                throw new Error("Failed to get response reader");
+            }
+
+            // Process the streaming response
+            const decoder = new TextDecoder();
+            let buffer = "";
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                // Decode the chunk and add to buffer
+                buffer += decoder.decode(value, { stream: true });
+
+                // Process any complete SSE messages in the buffer
+                let boundary = buffer.indexOf("\n\n");
+                while (boundary > -1) {
+                    const line = buffer.substring(0, boundary);
+                    buffer = buffer.substring(boundary + 2);
+
+                    if (line.startsWith("data: ")) {
+                        try {
+                            const eventData = JSON.parse(line.substring(6));
+                            if (eventData.chunk) {
+                                setResponse((prev) => prev + eventData.chunk);
+                            }
+                            if (eventData.done) {
+                                setStreaming(false);
+                                // Refresh history after completion
+                                const historyRes = await axios.get("http://localhost:8000/api/responses/");
+                                setPreviousResponses(historyRes.data);
+                                break;
+                            }
+                        } catch (e) {
+                            console.error("Error parsing SSE data:", e);
+                        }
+                    }
+
+                    boundary = buffer.indexOf("\n\n");
+                }
+            }
         } catch (err) {
             console.error("Error:", err);
             if (axios.isAxiosError(err)) {
@@ -60,10 +114,11 @@ export default function Home() {
                     setError(`Error: ${err.message}`);
                 }
             } else {
-                setError("An unexpected error occurred");
+                setError(`An unexpected error occurred: ${err instanceof Error ? err.message : String(err)}`);
             }
         } finally {
             setLoading(false);
+            setStreaming(false);
         }
     };
 
@@ -138,7 +193,7 @@ export default function Home() {
                             <div className="text-red-600 bg-red-50 p-3 rounded-md border border-red-200">{error}</div>
                         )}
 
-                        {response && (
+                        {(response || streaming) && (
                             <div className="mt-6">
                                 <h2 className="text-lg font-medium text-gray-800 mb-2">Response:</h2>
                                 <div className="bg-gray-50 p-4 rounded-md border border-gray-200 whitespace-pre-wrap">
