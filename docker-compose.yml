@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+    postgres:
+        image: postgres:16
+        container_name: wingman-postgres
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: test123
+            POSTGRES_DB: postgres
+        ports:
+            - "5431:5432" # Map to port 5431 as in your Django settings
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+        restart: unless-stopped
+        networks:
+            - wingman-network
+
+    ollama:
+        build:
+            context: .
+            dockerfile: Dockerfile.ollama
+        container_name: wingman-ollama
+        ports:
+            - "11434:11434" # Map to the port expected by your Django backend
+        volumes:
+            - ollama-models:/root/.ollama
+        restart: unless-stopped
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          count: 1
+                          capabilities: [gpu]
+        environment:
+            - NVIDIA_VISIBLE_DEVICES=all
+        networks:
+            - wingman-network
+
+networks:
+    wingman-network:
+        driver: bridge
+
+volumes:
+    postgres-data:
+    ollama-models:

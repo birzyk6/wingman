@@ -1,0 +1,51 @@
+FROM ollama/ollama:latest
+
+# Set environment variable for GPU usage
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+ENV NVIDIA_VISIBLE_DEVICES=all
+
+# Set up working directory
+WORKDIR /app
+
+# Install curl for healthcheck
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# Create startup script with proper line endings
+RUN echo '#!/bin/bash\n\
+# Start Ollama server in the background\n\
+ollama serve &\n\
+\n\
+# Wait for Ollama server to start\n\
+echo "Waiting for Ollama server to start..."\n\
+for i in $(seq 1 30); do\n\
+    if curl -s http://localhost:11434/api/health >/dev/null; then\n\
+        echo "Ollama server is up!"\n\
+        break\n\
+    fi\n\
+    echo "Waiting..."\n\
+    sleep 2\n\
+done\n\
+\n\
+# Pull the model if not already present\n\
+if ! ollama list | grep -q "gemma3:1b"; then\n\
+    echo "Pulling gemma3:1b model..."\n\
+    ollama pull gemma3:1b\n\
+fi\n\
+\n\
+echo "Ollama setup complete!"\n\
+\n\
+# Keep the container running\n\
+tail -f /dev/null\n\
+' > /app/start-ollama.sh
+
+# Make the script executable
+RUN chmod +x /app/start-ollama.sh
+
+# Expose Ollama API port
+EXPOSE 11434
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD curl -f http://localhost:11434/api/health || exit 1
+
+# Run the startup script
+ENTRYPOINT ["/bin/bash", "/app/start-ollama.sh"]
