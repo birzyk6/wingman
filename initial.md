@@ -12,7 +12,19 @@ Podzielony jest on na foldery **backend** i **frontend**
 
 # 0. Docker
 
-Odpalcie te dwa kontenery na dockerze co robiliśmy, wejdźcie w **Docker Desktop**, potem w lewym pasku **Containers** i tam macie taki przycisk **_play_** no i wciśnijcie, żeby odpalił wam się każdy kontener.
+Zrobiłem plik `docker-compose.yml`, który ogarnie nam kontenery.
+
+Wchodzimy do głównego folderu.
+
+```shell
+C:\Users\birzy\Desktop\wingman
+```
+
+```shell
+docker-compose up -d
+```
+
+To odpali nam kontenery w dockerze już wszystko ogarnięte jedną komendą nie trzeba nic zmieniać.
 
 # 1. Backend
 

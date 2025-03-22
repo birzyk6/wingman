@@ -2,11 +2,29 @@
 
 # 0. Docker
 
-Odpalcie te dwa kontenery na dockerze co robiliśmy, wejdźcie w **Docker Desktop**, potem w lewym pasku **Containers** i tam macie taki przycisk **_play_** no i wciśnijcie, żeby odpalił wam się każdy kontener.
+Odpalamy pierwszy terminal
+
+Jeżeli odpalaliście już wcześniej `docker-compose up -d`, to wystarczy teraz tylko
+
+```shell
+docker-compose start
+```
+
+Jak chcecie wyłączyć kontenery, to
+
+```shell
+docker-compose stop
+```
+
+Jak chcecie usunąć kontenery:
+
+```shell
+docker-compose down
+```
 
 # 1. Odpalanie Backendu (Django)
 
-Odpalcie sobie nowy terminal \
+Odpalcie sobie drugi terminal \
 nazwijcie go **django** (opcjonalne)
 
 ### Wchodzimy do folderu backend
@@ -41,7 +59,21 @@ python manage.py migrate
 python manage.py runserver
 ```
 
+Jak nie zadziała to musicie wcześniej mieć terminal odpalony w dobrym środowisku, czyli wpisujecie
+
+```shell
+venv\Scripts\activate
+```
+
+### Mac / Linux
+
+```shell
+source venv/bin/activate
+```
+
 # 2. Odpalanie frontendu (NextJS)
+
+Odpalamy trzeci terminal
 
 ```shell
 cd frontend
