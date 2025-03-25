@@ -112,11 +112,12 @@ def create_user(request):
     email = request.data.get("email", "")
     sex= request.data.get("sex", "")
     age = request.data.get("age", "")
-    if not all([name, email, sex, age]):
+    password = request.data.get("password", "")
+    if not all([name, email, sex, age, password]):
         return Response({"error": "All fields are required"}, status=400)
     try:
         user = WingmanUsers.objects.create(
-            name=name, email=email, sex=sex, age=int(age)
+            name=name, email=email, sex=sex, age=int(age), password=password
         )
 
         user_data = {
@@ -125,6 +126,7 @@ def create_user(request):
             "email": user.email,
             "sex": user.sex,
             "age": user.age,
+            "password": user.password,
             "created_at": user.created_at.strftime("%Y-%m-%d %H:%M:%S"),
         }
 

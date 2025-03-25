@@ -20,7 +20,8 @@ class WingmanUsers(models.Model):
     name = models.TextField(max_length=100)
     email = models.TextField(unique=True)
     sex = models.TextField(max_length=10)
-    age = models.IntegerField(max_length=3)
+    age = models.IntegerField()
+    password = models.TextField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
