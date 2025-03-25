@@ -119,7 +119,7 @@ def generate_tinder_description(request):
     if not name or not interests or not looking_for or not age or not location or not hobbies:
         return Response({"error": "All fields are required."}, status=400)
 
-    prompt = f"Generate a Tinder bio for a user named {name}. They are {age} years old and live in {location}. They are interested in: {interests}. They are looking for: {looking_for}. Their hobbies include: {hobbies}. Write a funny and engaging Tinder bio."
+    prompt = f"Stwórz biografię na Tindera dla użytkownika o imieniu {name}. Ma {age} lat i mieszka w {location}. Interesuje się: {interests}. Szuka: {looking_for}. Jego/Jej hobby to: {hobbies}. Napisz zabawne i angażujące bio na Tinder"
 
     payload = {
         "model": "gemma3:4b-it-q4_K_M",  

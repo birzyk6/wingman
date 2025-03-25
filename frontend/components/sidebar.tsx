@@ -21,13 +21,6 @@ export function Sidebar({
         </h2>
         <ul className="space-y-2 mt-4">
           <li>
-            <Link href="/chatbot">
-              <span className="text-gray-900 dark:text-gray-100 hover:underline">
-                Chatbot
-              </span>
-            </Link>
-          </li>
-          <li>
             <Link href="/generator">
               <span className="text-gray-900 dark:text-gray-100 hover:underline">
                 Generator opisu na Tinderze
