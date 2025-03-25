@@ -3,7 +3,7 @@ import json
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.http import StreamingHttpResponse
-from .models import LlamaResponse, WingmanUsers
+from .models import LlamaResponse, WingmanUsers, LlamaDescription
 
 
 @api_view(["POST"])
@@ -129,8 +129,66 @@ def create_user(request):
             "password": user.password,
             "created_at": user.created_at.strftime("%Y-%m-%d %H:%M:%S"),
         }
-
         return Response(user_data, status=201)
 
     except Exception as e:
         return Response({"error": str(e)}, status=500)
+
+@api_view(["GET"])
+def get_user(request):
+    """Get all previously stored responses"""
+    users = WingmanUsers.objects.all()
+    data = [
+        {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "sex":user.sex,
+            "age": user.age,
+        }
+        for user in users
+    ]
+    return Response(data)
+
+@api_view(["POST"])
+def create_description(request):
+    user_id = request.data.get("user_id", "")
+    prompt = request.data.get("prompt", "")
+    description = request.data.get("description", "")
+    if not all([user_id, prompt, description]):
+        return Response({"error": "All fields are required"}, status=400)
+    try:
+        user = WingmanUsers.objects.get(id=user_id)
+        description = LlamaDescription.objects.create(
+            user=user, prompt=prompt, description=description
+        )
+
+        description_data = {
+            "id": description.id,
+            "user_id": description.user_id,
+            "prompt": description.prompt,
+            "description": description.description,
+            "created_at": description.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        return Response(description_data, status=201)
+
+    except WingmanUsers.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(["GET"])
+def get_description(request):
+    """Get all previously stored responses"""
+    descriptions = LlamaDescription.objects.all()
+    data = [
+        {
+            "id": description.id,
+            "user_id": description.user_id,
+            "prompt": description.prompt,
+            "description": description.description,
+            "created_at": description.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        for description in descriptions
+    ]
+    return Response(data)

@@ -33,3 +33,18 @@ class WingmanUsers(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+class LlamaDescription(models.Model):
+    user= models.ForeignKey(WingmanUsers, on_delete=models.CASCADE)
+    prompt = models.TextField()
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return (
+            f"Description: {self.description[:30]}..."
+            if len(self.description) > 30
+            else f"Description: {self.description}"
+        )
+
+    class Meta:
+        ordering = ["-created_at"]
