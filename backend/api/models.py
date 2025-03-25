@@ -4,6 +4,7 @@ from django.db import models
 class LlamaResponse(models.Model):
     prompt = models.TextField()
     response = models.TextField()
+    context=models.JSONField(default=list)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

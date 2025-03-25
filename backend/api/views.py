@@ -14,36 +14,38 @@ def generate_response(request):
 
     stream_response = request.data.get("stream", True)  # Default to streaming
 
-    # request format
+    last_responses = LlamaResponse.objects.order_by("-created_at")[:5]
+
+    context_text = "\n".join(
+        [f"User: {r.prompt}\nAI: {r.response}" for r in reversed(last_responses)]
+    )
+
+    full_prompt = f"{context_text}\nUser: {prompt}\nAI:"
+
     payload = {
-        "model": "gemma3:4b-it-q4_K_M",  # Quantized version for smaller VRAM
-        "prompt": prompt,
-        "system": "You are an empathic gay with dirty minds. You will help other to find a love in web.Generate response in points and dont generate any boiler plate text",
+        "model": "gemma3:4b-it-q4_K_M",
+        "prompt": full_prompt,
+        "system": "You are an empathetic AI assistant. Remember previous conversations and answer accordingly.",
         "stream": stream_response,
-        "context": [1,2,3,4,5,6]
+        "context": [],
     }
 
     try:
         if not stream_response:
-            # Non-streaming approach (original code)
             response = requests.post(
                 "http://localhost:11434/api/generate",
                 json=payload,
-                timeout=100,  # Increased timeout
+                timeout=100,
             )
-            response.raise_for_status()  # Raise an error for HTTP issues
+            response.raise_for_status()
 
             data = response.json()
             response_text = data.get("response", "")
 
-            # Save response to database
-            llama_response = LlamaResponse.objects.create(
-                prompt=prompt, response=response_text
-            )
+            LlamaResponse.objects.create(prompt=prompt, response=response_text)
 
             return Response({"response": response_text})
         else:
-            # Streaming approach
             def event_stream():
                 full_response = ""
                 with requests.post(
@@ -60,7 +62,6 @@ def generate_response(request):
                             full_response += response_chunk
                             yield f"data: {json.dumps({'chunk': response_chunk, 'done': chunk.get('done', False)})}\n\n"
 
-                            # If it's the final chunk, save the complete response
                             if chunk.get("done", False):
                                 LlamaResponse.objects.create(
                                     prompt=prompt, response=full_response
@@ -73,19 +74,12 @@ def generate_response(request):
             response["X-Accel-Buffering"] = "no"
             return response
 
-    except requests.exceptions.ConnectionError:
-        return Response(
-            {"error": "Could not connect to Ollama server. Is it running?"}, status=503
-        )
-    except requests.exceptions.Timeout:
-        return Response(
-            {"error": "Request to Ollama timed out. Try again or increase timeout."},
-            status=504,
-        )
     except requests.exceptions.HTTPError as e:
-        return Response(
-            {"error": f"HTTP error: {str(e)}"}, status=e.response.status_code
-        )
+        return Response({"error": f"HTTP error: {str(e)} - {e.response.text}"}, status=e.response.status_code)
+    except requests.exceptions.ConnectionError:
+        return Response({"error": "Could not connect to Ollama server. Is it running?"}, status=503)
+    except requests.exceptions.Timeout:
+        return Response({"error": "Request to Ollama timed out. Try again or increase timeout."}, status=504)
     except requests.exceptions.RequestException as e:
         return Response({"error": f"Failed to connect to Ollama: {str(e)}"}, status=500)
     except Exception as e:
