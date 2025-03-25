@@ -34,7 +34,7 @@ class WingmanUsers(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
-class LlamaDescription(models.Model):
+class LlamaChatting(models.Model):
     user= models.ForeignKey(WingmanUsers, on_delete=models.CASCADE)
     prompt = models.TextField()
     description = models.TextField()
