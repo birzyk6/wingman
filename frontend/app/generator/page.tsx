@@ -126,12 +126,17 @@ const TinderDescriptionGenerator = () => {
 
         {/* Animowane generowanie tekstu */}
         <div className="mt-6">
-          {displayedText && (
+          {generatedDescription && (
             <div className="p-4 bg-gray-100 rounded-md shadow-sm text-lg">
-              <p className="text-gray-700">
-                {displayedText}
-                {isTyping && <span className="animate-pulse">|</span>}
-              </p>
+              <h2 className="text-xl font-bold text-gray-800 mb-2">
+                📌 Twój Tinder Bio:
+              </h2>
+              <hr className="border-gray-300 mb-2" />
+              <div className="space-y-3">
+                <div className="p-4 border rounded-lg shadow-md bg-white">
+                  {generatedDescription} {/* Wyświetl cały tekst */}
+                </div>
+              </div>
             </div>
           )}
         </div>

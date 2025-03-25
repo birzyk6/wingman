@@ -119,10 +119,13 @@ def generate_tinder_description(request):
     if not name or not interests or not looking_for or not age or not location or not hobbies:
         return Response({"error": "All fields are required."}, status=400)
 
-    prompt = f"Stwórz biografię na Tindera dla użytkownika o imieniu {name}. Ma {age} lat i mieszka w {location}. Interesuje się: {interests}. Szuka: {looking_for}. Jego/Jej hobby to: {hobbies}. Napisz zabawne i angażujące bio na Tinder"
+    prompt = f"""
+    Stwórz jedno spójne bio na Tinder dla osoby o imieniu {name}, która ma {age} lat, mieszka w {location}, interesuje się {interests}, szuka {looking_for}, a jej hobby to {hobbies}. Użyj poprawnej polszczyzny, nie dodawaj żadnych wstępów ani komentarzy. Bio powinno być naturalne, łatwe do przeczytania, przyjazne i pełne pozytywnej energii. Daj rozbudowane bio. 
+    """
 
-    payload = {
-        "model": "gemma3:4b-it-q4_K_M",  
+    # stream_response = request.data.get("stream", True) 
+    payload = {        
+        "model": "gemma3:4b-it-q4_K_M",
         "prompt": prompt,
         "stream": False,
     }
@@ -130,14 +133,10 @@ def generate_tinder_description(request):
     try:
         response = requests.post("http://localhost:11434/api/generate", json=payload, timeout=100)
         response.raise_for_status()  
-
         data = response.json()
         description = data.get("response", "")
-
         if not description:
             return Response({"error": "Ollama returned an empty response."}, status=500)
-
         return Response({"response": description})
-
     except requests.exceptions.RequestException as e:
         return Response({"error": f"Error communicating with Ollama: {str(e)}"}, status=500)
