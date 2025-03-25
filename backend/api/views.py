@@ -3,7 +3,7 @@ import json
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.http import StreamingHttpResponse
-from .models import LlamaResponse
+from .models import LlamaResponse, WingmanUsers
 
 
 @api_view(["POST"])
@@ -18,6 +18,7 @@ def generate_response(request):
     payload = {
         "model": "gemma3:4b-it-q4_K_M",  # Quantized version for smaller VRAM
         "prompt": prompt,
+        "system": "You are an empathic gay with dirty minds. You will help other to find a love in web.Generate response in points and dont generate any boiler plate text",
         "stream": stream_response,
     }
 
@@ -104,3 +105,30 @@ def get_responses(request):
         for response in responses
     ]
     return Response(data)
+
+@api_view(["POST"])
+def create_user(request):
+    name = request.data.get("name", "")
+    email = request.data.get("email", "")
+    sex= request.data.get("sex", "")
+    age = request.data.get("age", "")
+    if not all([name, email, sex, age]):
+        return Response({"error": "All fields are required"}, status=400)
+    try:
+        user = WingmanUsers.objects.create(
+            name=name, email=email, sex=sex, age=int(age)
+        )
+
+        user_data = {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "sex": user.sex,
+            "age": user.age,
+            "created_at": user.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+
+        return Response(user_data, status=201)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)

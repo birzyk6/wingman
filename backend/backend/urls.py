@@ -16,9 +16,10 @@ Including another URLconf
 """
 
 from django.urls import path
-from api.views import generate_response, get_responses
+from api.views import generate_response, get_responses, create_user
 
 urlpatterns = [
     path("api/generate/", generate_response),
     path("api/responses/", get_responses),
+    path("api/create_user/", create_user),
 ]
