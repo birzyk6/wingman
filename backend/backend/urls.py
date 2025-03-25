@@ -16,9 +16,10 @@ Including another URLconf
 """
 
 from django.urls import path
-from api.views import generate_response, get_responses
+from api.views import generate_response, get_responses, generate_tinder_description
 
 urlpatterns = [
     path("api/generate/", generate_response),
     path("api/responses/", get_responses),
+    path('api/generate_tinder_description/', generate_tinder_description, name='generate_tinder_description'),
 ]

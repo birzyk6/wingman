@@ -16,7 +16,7 @@ def generate_response(request):
 
     # request format
     payload = {
-        "model": "gemma3:4b-it-q4_K_M",  # Quantized version for smaller VRAM
+        "model": "gemma3:4b-it-q4_K_M",  # Quantized version for smaller VRAM  # gemma3:4b-it-q4_K_M    gemma3:1b
         "prompt": prompt,
         "stream": stream_response,
     }
@@ -104,3 +104,40 @@ def get_responses(request):
         for response in responses
     ]
     return Response(data)
+
+
+
+@api_view(["POST"])
+def generate_tinder_description(request):
+    name = request.data.get("name", "")
+    interests = request.data.get("interests", "")
+    looking_for = request.data.get("lookingFor", "")
+    age = request.data.get("age", "")
+    location = request.data.get("location", "")
+    hobbies = request.data.get("hobbies", "")
+
+    if not name or not interests or not looking_for or not age or not location or not hobbies:
+        return Response({"error": "All fields are required."}, status=400)
+
+    prompt = f"Generate a Tinder bio for a user named {name}. They are {age} years old and live in {location}. They are interested in: {interests}. They are looking for: {looking_for}. Their hobbies include: {hobbies}. Write a funny and engaging Tinder bio."
+
+    payload = {
+        "model": "gemma3:4b-it-q4_K_M",  
+        "prompt": prompt,
+        "stream": False,
+    }
+
+    try:
+        response = requests.post("http://localhost:11434/api/generate", json=payload, timeout=100)
+        response.raise_for_status()  
+
+        data = response.json()
+        description = data.get("response", "")
+
+        if not description:
+            return Response({"error": "Ollama returned an empty response."}, status=500)
+
+        return Response({"response": description})
+
+    except requests.exceptions.RequestException as e:
+        return Response({"error": f"Error communicating with Ollama: {str(e)}"}, status=500)
