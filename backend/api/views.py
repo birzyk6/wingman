@@ -9,12 +9,21 @@ from .models import LlamaResponse, WingmanUsers
 @api_view(["POST"])
 def generate_response(request):
     prompt = request.data.get("prompt", "")
+    user_id = request.data.get("user_id")
+
     if not prompt:
         return Response({"error": "Prompt is required"}, status=400)
+    if not user_id:
+        return Response({"error": "User ID is required"}, status=400)
 
-    stream_response = request.data.get("stream", True)  # Default to streaming
+    try:
+        user = WingmanUsers.objects.get(id=user_id)
+    except WingmanUsers.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
 
-    last_responses = LlamaResponse.objects.order_by("-created_at")[:5]
+    stream_response = request.data.get("stream", True)
+
+    last_responses = LlamaResponse.objects.filter(user=user).order_by("-created_at")[:5]
 
     context_text = "\n".join(
         [f"User: {r.prompt}\nAI: {r.response}" for r in reversed(last_responses)]
@@ -42,9 +51,9 @@ def generate_response(request):
             data = response.json()
             response_text = data.get("response", "")
 
-            LlamaResponse.objects.create(prompt=prompt, response=response_text)
+            LlamaResponse.objects.create(prompt=prompt, response=response_text, user=user)
 
-            return Response({"response": response_text})
+            return Response({"response": response_text, "user_id": user.id})
         else:
             def event_stream():
                 full_response = ""
@@ -64,7 +73,7 @@ def generate_response(request):
 
                             if chunk.get("done", False):
                                 LlamaResponse.objects.create(
-                                    prompt=prompt, response=full_response
+                                    prompt=prompt, response=full_response, user=user
                                 )
 
             response = StreamingHttpResponse(
@@ -88,14 +97,25 @@ def generate_response(request):
 
 @api_view(["GET"])
 def get_responses(request):
-    """Get all previously stored responses"""
-    responses = LlamaResponse.objects.all()
+    user_id = request.query_params.get("user_id")
+
+    if not user_id:
+        return Response({"error": "User ID is required"}, status=400)
+
+    try:
+        user = WingmanUsers.objects.get(id=user_id)
+    except WingmanUsers.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+
+    responses = LlamaResponse.objects.filter(user=user).order_by("-created_at")
+
     data = [
         {
             "id": response.id,
             "prompt": response.prompt,
             "response": response.response,
             "created_at": response.created_at,
+            "user_id": response.user.id
         }
         for response in responses
     ]
