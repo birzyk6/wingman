@@ -35,6 +35,14 @@ export function useAIAssistant() {
     const handleSubmit = async () => {
         if (!prompt.trim()) return;
 
+        // get userId from local storage
+        const userId = localStorage.getItem("wingmanUserId");
+        if (!userId) {
+            setError("User ID not found. Please log in.");
+            return;
+        }
+        const parsedUserId = parseInt(userId, 10);
+
         setLoading(true);
         setStreaming(true);
         setError("");
@@ -43,6 +51,7 @@ export function useAIAssistant() {
         try {
             await streamGenerateResponse(
                 prompt,
+                parsedUserId,
                 (chunk) => setResponse((prev) => prev + chunk),
                 async () => {
                     setStreaming(false);

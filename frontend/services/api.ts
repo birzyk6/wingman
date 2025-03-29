@@ -10,12 +10,19 @@ export interface ResponseData {
 const API_URL = "http://localhost:8000/api";
 
 export async function fetchResponses(): Promise<ResponseData[]> {
-    const res = await axios.get(`${API_URL}/responses/`);
+    // get userId from local storage
+    const userId = localStorage.getItem("wingmanUserId");
+    if (!userId) {
+        throw new Error("User ID not found. Please log in.");
+    }
+    const parsedUserId = parseInt(userId, 10);
+    const res = await axios.get(`${API_URL}/responses/?user_id=${parsedUserId}`);
     return res.data;
 }
 
 export async function streamGenerateResponse(
     prompt: string,
+    user_id: number,
     onChunk: (chunk: string) => void,
     onDone: () => void
 ): Promise<void> {
@@ -24,7 +31,7 @@ export async function streamGenerateResponse(
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ prompt, stream: true }),
+        body: JSON.stringify({ prompt, user_id, stream: true }),
     });
 
     if (!response.ok) {

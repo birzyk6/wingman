@@ -5,11 +5,6 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-    title: "Wingman AI Assistant",
-    description: "Dating's never been easier!",
-};
-
 export default function RootLayout({
     children,
 }: Readonly<{

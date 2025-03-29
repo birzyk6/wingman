@@ -5,6 +5,7 @@ import { PromptForm } from "@/components/prompt-input-form";
 import { ResponseDisplay } from "@/components/response-display";
 import { useAIAssistant } from "@/hooks/useAIAssistant";
 import { ThemeToggle } from "@/components/theme-toggle";
+import LogoutButton from "@/components/Logout";
 
 export default function Home() {
     const {
@@ -35,6 +36,7 @@ export default function Home() {
                     <div className="flex justify-between items-center mb-8">
                         <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Wingman AI Assistant</h1>
                         <ThemeToggle />
+                        <LogoutButton />
                     </div>
 
                     <PromptForm prompt={prompt} loading={loading} onPromptChange={setPrompt} onSubmit={handleSubmit} />
