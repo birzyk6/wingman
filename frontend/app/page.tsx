@@ -35,8 +35,10 @@ export default function Home() {
                 <div className="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden p-6">
                     <div className="flex justify-between items-center mb-8">
                         <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Wingman AI Assistant</h1>
-                        <ThemeToggle />
-                        <LogoutButton />
+                        <div className="flex items-center space-x-4">
+                            <ThemeToggle />
+                            <LogoutButton />
+                        </div>
                     </div>
 
                     <PromptForm prompt={prompt} loading={loading} onPromptChange={setPrompt} onSubmit={handleSubmit} />
