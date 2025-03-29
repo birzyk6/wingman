@@ -51,10 +51,13 @@ def generate_response(request):
             data = response.json()
             response_text = data.get("response", "")
 
-            LlamaResponse.objects.create(prompt=prompt, response=response_text, user=user)
+            LlamaResponse.objects.create(
+                prompt=prompt, response=response_text, user=user
+            )
 
             return Response({"response": response_text, "user_id": user.id})
         else:
+
             def event_stream():
                 full_response = ""
                 with requests.post(
@@ -84,11 +87,19 @@ def generate_response(request):
             return response
 
     except requests.exceptions.HTTPError as e:
-        return Response({"error": f"HTTP error: {str(e)} - {e.response.text}"}, status=e.response.status_code)
+        return Response(
+            {"error": f"HTTP error: {str(e)} - {e.response.text}"},
+            status=e.response.status_code,
+        )
     except requests.exceptions.ConnectionError:
-        return Response({"error": "Could not connect to Ollama server. Is it running?"}, status=503)
+        return Response(
+            {"error": "Could not connect to Ollama server. Is it running?"}, status=503
+        )
     except requests.exceptions.Timeout:
-        return Response({"error": "Request to Ollama timed out. Try again or increase timeout."}, status=504)
+        return Response(
+            {"error": "Request to Ollama timed out. Try again or increase timeout."},
+            status=504,
+        )
     except requests.exceptions.RequestException as e:
         return Response({"error": f"Failed to connect to Ollama: {str(e)}"}, status=500)
     except Exception as e:
@@ -115,17 +126,18 @@ def get_responses(request):
             "prompt": response.prompt,
             "response": response.response,
             "created_at": response.created_at,
-            "user_id": response.user.id
+            "user_id": response.user.id,
         }
         for response in responses
     ]
     return Response(data)
 
+
 @api_view(["POST"])
 def create_user(request):
     name = request.data.get("name", "")
     email = request.data.get("email", "")
-    sex= request.data.get("sex", "")
+    sex = request.data.get("sex", "")
     age = request.data.get("age", "")
     password = request.data.get("password", "")
     if not all([name, email, sex, age, password]):
@@ -149,6 +161,7 @@ def create_user(request):
     except Exception as e:
         return Response({"error": str(e)}, status=500)
 
+
 @api_view(["GET"])
 def get_user(request):
     """Get all previously stored responses"""
@@ -158,10 +171,9 @@ def get_user(request):
             "id": user.id,
             "name": user.name,
             "email": user.email,
-            "sex":user.sex,
+            "sex": user.sex,
             "age": user.age,
         }
         for user in users
     ]
     return Response(data)
-

@@ -19,11 +19,12 @@ class WingmanUsers(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
+
 class LlamaResponse(models.Model):
     prompt = models.TextField()
     response = models.TextField()
-    context=models.JSONField(default=list)
-    user= models.ForeignKey(WingmanUsers, on_delete=models.CASCADE, null=True)
+    context = models.JSONField(default=list)
+    user = models.ForeignKey(WingmanUsers, on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -36,11 +37,13 @@ class LlamaResponse(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
+
 class LlamaChatting(models.Model):
-    user= models.ForeignKey(WingmanUsers, on_delete=models.CASCADE)
+    user = models.ForeignKey(WingmanUsers, on_delete=models.CASCADE)
     prompt = models.TextField()
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+
     def __str__(self):
         return (
             f"Description: {self.description[:30]}..."
