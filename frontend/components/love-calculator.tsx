@@ -97,10 +97,10 @@ export default function LoveCalculator() {
     };
 
     return (
-        <div className="flex flex-col h-screen p-4">
+        <div className="flex flex-col h-full p-8 bg-zinc-100 dark:bg-zinc-950 overflow-y-auto">
             {/* Input Section */}
-            <div className="w-full p-4 bg-white dark:bg-zinc-900 rounded-xl shadow-md mb-6">
-                <h1 className="text-3xl font-bold text-pink-600 dark:text-pink-400 mb-6 text-center">
+            <div className="w-full p-8 bg-white dark:bg-zinc-900 rounded-xl shadow-md mb-6">
+                <h1 className="text-4xl font-bold text-pink-600 dark:text-pink-400 mb-6 text-center">
                     Love Calculator
                 </h1>
 
@@ -142,9 +142,9 @@ export default function LoveCalculator() {
                         disabled={!yourName || !theirName || loading}
                         className={`w-full flex items-center justify-center py-3 px-4 rounded-md text-white text-lg transition-colors ${
                             !yourName || !theirName || loading
-                                ? "bg-pink-300 dark:bg-pink-800 cursor-not-allowed animate-pulse"
+                                ? "bg-pink-300 dark:bg-pink-800 cursor-not-allowed"
                                 : "bg-pink-500 hover:bg-pink-600 dark:bg-pink-700 dark:hover:bg-pink-800"
-                        }`}
+                        } ${loading ? "animate-pulse" : ""}`}
                     >
                         {loading ? (
                             <div className="flex items-center">

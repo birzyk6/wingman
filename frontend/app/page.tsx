@@ -64,7 +64,7 @@ export default function Home() {
     };
 
     return (
-        <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950 flex">
+        <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950 flex overflow-hidden">
             {/* Sidebar with option selection capability */}
             <Sidebar
                 previousResponses={previousResponses}
@@ -75,7 +75,7 @@ export default function Home() {
             />
 
             {/* Main content area that changes based on selection */}
-            <div className="flex-1 overflow-y-auto">{renderSelectedComponent()}</div>
+            <main className="flex-1 overflow-y-auto h-screen">{renderSelectedComponent()}</main>
         </div>
     );
 }
