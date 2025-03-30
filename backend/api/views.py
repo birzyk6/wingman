@@ -3,7 +3,7 @@ import json
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.http import StreamingHttpResponse
-from .models import LlamaResponse, WingmanUsers
+from .models import *
 
 
 @api_view(["POST"])
@@ -238,3 +238,62 @@ def login_user(request):
         return Response({"error": "Invalid credentials"}, status=401)
     except Exception as e:
         return Response({"error": str(e)}, status=500)
+
+@api_view(["POST"])
+def create_chat_window(request):
+    user_id = request.data.get("user_id")
+    response_id = request.data.get("response_id")
+
+    if not user_id:
+        return Response({"error": "User ID is required"}, status=400)
+    if not response_id:
+        return Response({"error": "Response ID is required"}, status=400)
+
+    try:
+        user = WingmanUsers.objects.get(id=user_id)
+    except WingmanUsers.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+
+    try:
+        response = LlamaResponse.objects.get(id=response_id)
+    except LlamaResponse.DoesNotExist:
+        return Response({"error": "Response not found"}, status=404)
+
+    chat_window, created = LlamaChatWindow.objects.get_or_create(user=user)
+    chat_window.responses.add(response)
+
+    data = {
+        "id": chat_window.id,
+        "user_id": chat_window.user.id,
+        "responses": [r.id for r in chat_window.responses.all()],
+        "created_at": chat_window.created_at,
+    }
+    return Response(data)
+
+
+@api_view(["GET"])
+def get_chat_windows(request):
+    user_id = request.query_params.get("user_id")
+
+    if not user_id:
+        return Response({"error": "User ID is required"}, status=400)
+
+    try:
+        user = WingmanUsers.objects.get(id=user_id)
+    except WingmanUsers.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+
+    chat_windows = LlamaChatWindow.objects.filter(user=user).order_by("-created_at")
+
+    data = [
+        {
+            "id": chat_window.id,
+            "user_id": chat_window.user.id,
+            "response_id": [{
+                "id":r.id, "prompt": r.prompt, "response": r.response, "created_at": r.created_at
+            }for r in chat_window.responses.all()],
+            "created_at": chat_window.created_at,
+        }
+        for chat_window in chat_windows
+    ]
+    return Response(data)

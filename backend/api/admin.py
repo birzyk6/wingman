@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import LlamaResponse, WingmanUsers, LlamaChatting
+from .models import LlamaResponse, WingmanUsers, LlamaChatWindow
 
 
 @admin.register(WingmanUsers)
@@ -27,18 +27,10 @@ class LlamaResponseAdmin(admin.ModelAdmin):
     response_short.short_description = "Response"
 
 
-@admin.register(LlamaChatting)
-class LlamaChattingAdmin(admin.ModelAdmin):
-    list_display = ("id", "description_short", "created_at")
-    search_fields = ("description", "prompt")
+@admin.register(LlamaChatWindow)
+class LlamaChatWindowAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "created_at")
+    search_fields = ("user",)
     list_filter = ("created_at",)
     readonly_fields = ("created_at",)
 
-    def description_short(self, obj):
-        return (
-            obj.description[:50] + "..."
-            if len(obj.description) > 50
-            else obj.description
-        )
-
-    description_short.short_description = "Description"

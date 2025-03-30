@@ -38,17 +38,16 @@ class LlamaResponse(models.Model):
         ordering = ["-created_at"]
 
 
-class LlamaChatting(models.Model):
+class LlamaChatWindow(models.Model):
     user = models.ForeignKey(WingmanUsers, on_delete=models.CASCADE)
-    prompt = models.TextField()
-    description = models.TextField()
+    responses = models.ManyToManyField(LlamaResponse)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return (
-            f"Description: {self.description[:30]}..."
-            if len(self.description) > 30
-            else f"Description: {self.description}"
+            f"User: {self.user[:30]}..."
+            if len(self.user) > 30
+            else f"User: {self.user}"
         )
 
     class Meta:

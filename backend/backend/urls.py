@@ -24,4 +24,6 @@ urlpatterns = [
     path("api/create_user/", create_user),
     path("api/get_user/", get_user),
     path("api/login_user/", login_user),
+    path("api/create_chat_window/", create_chat_window),
+    path("api/get_chat_window/", get_chat_windows),
 ]
