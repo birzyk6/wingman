@@ -7,6 +7,20 @@ export interface ResponseData {
     created_at: string;
 }
 
+export interface UserData {
+    id: string;
+    name: string;
+    email: string;
+    sex: string;
+    age: number;
+    created_at: string;
+}
+
+export interface LoveCalculatorResponse {
+    love_score: number;
+    message: string;
+}
+
 const API_URL = "http://localhost:8000/api";
 
 export async function fetchResponses(): Promise<ResponseData[]> {
@@ -79,4 +93,22 @@ export async function streamGenerateResponse(
             boundary = buffer.indexOf("\n\n");
         }
     }
+}
+
+export async function getUserData(): Promise<UserData | null> {
+    const userId = localStorage.getItem("wingmanUserId");
+    if (!userId) {
+        return null;
+    }
+    const parsedUserId = parseInt(userId, 10);
+    const res = await axios.get(`${API_URL}/get_user/?user_id=${parsedUserId}`);
+    return res.data;
+}
+
+export async function calculateLoveScore(
+    name1: string,
+    name2: string
+): Promise<{ love_score: number; message: string }> {
+    const res = await axios.post(`${API_URL}/love_calculator/`, { name1, name2 });
+    return res.data;
 }

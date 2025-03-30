@@ -1,3 +1,7 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+.btn {
+    @apply bg-zinc-100 hover:bg-zinc-200 text-black dark:bg-zinc-800 dark:hover:bg-zinc-950 dark:text-white items-center cursor-pointer justify-items-center rounded-lg transition-colors;
+}

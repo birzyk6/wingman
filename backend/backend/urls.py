@@ -24,4 +24,5 @@ urlpatterns = [
     path("api/create_user/", create_user),
     path("api/get_user/", get_user),
     path("api/login_user/", login_user),
+    path("api/love_calculator/", love_calculator),
 ]
