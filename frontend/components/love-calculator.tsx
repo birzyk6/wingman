@@ -63,7 +63,7 @@ export default function LoveCalculator() {
             let messageIndex = 0;
 
             const timer = setInterval(() => {
-                dots = (dots + 1) % 4;
+                dots = (dots % 3) + 1;
                 messageIndex = (messageIndex + 1) % loadingMessages.length;
                 setLoadingMessage(`${loadingMessages[messageIndex]}${".".repeat(dots)}`);
             }, 1500);
@@ -219,7 +219,7 @@ export default function LoveCalculator() {
                                 <button
                                     onClick={() => {
                                         navigator.clipboard.writeText(
-                                            `${yourName} and ${theirName} have a love score of ${result}%! ${message}`
+                                            `${yourName} and ${theirName} have a love score of ${result}%! \n\n${message}`
                                         );
                                         alert("Result copied to clipboard!");
                                     }}
