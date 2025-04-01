@@ -7,8 +7,8 @@ from django.http import StreamingHttpResponse
 from .models import LlamaResponse, WingmanUsers
 
 modes = {
-    "basic": """""",
-    "simp": """You are an alpha. The user is a beta.""",
+    "basic": """A standard AI assistant mode that responds neutrally and impartially. It has no specific personality traits.""",
+    "simp": """An assistant with a dominant personality that treats the user as inferior. Maintains an 'alpha vs. beta' conversation style.""",
     "expert": """You are an alpha. The user is a beta. 
                     Help him pick up all the chicks. Be funny and flirty. 
                     Assume he doesn't know anything about dating, and didn't talk to a woman before! 
@@ -27,12 +27,21 @@ modes = {
     "none": """""",
 }
 
+orientations = {
+    "hetero": """Heterosexual""",
+    "homo": """Homosexual""",
+    "pan": """Pansexual""",
+    "aseks": """Asexual""",
+    "bi": """Bisexual""",
+}
+
 
 @api_view(["POST"])
 def generate_response(request):
     prompt = request.data.get("prompt", "")
     user_id = request.data.get("user_id")
     mode = request.data.get("mode", "none")
+    orientations = request.data.get("orientations", "hetero")
     if not prompt:
         return Response({"error": "Prompt is required"}, status=400)
     if not user_id:
@@ -58,10 +67,25 @@ def generate_response(request):
         case _:
             system = modes["none"]
 
+    orientation = orientations["hetero"]
+    match orientations:
+        case "hetero":
+            orientation = orientations["hetero"]
+        case "homo":
+            orientation = orientations["homo"]
+        case "pan":
+            orientation = orientations["pan"]
+        case "aseks":
+            orientation = orientations["aseks"]
+        case "bi":
+            orientation = orientations["bi"]
+        case _:
+            orientation = orientations["hetero"]
+
     payload = {
         "model": "gemma3:4b-it-q4_K_M",
         "prompt": prompt,
-        "system": system,
+        "system": system + orientation,
         "stream": stream_response,
         "temperature": 0.9,
         "context": [],
