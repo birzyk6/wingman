@@ -27,11 +27,21 @@ modes={
     "none": """""",
 }
 
+orientations={
+    "hetero": """Heterosexual""",
+    "homo":"""Homosexual""",
+    "pan":"""Pansexual""",
+    "aseks":"""Asexual""",
+    "bi":"""Bisexual"""
+}
+
+
 @api_view(["POST"])
 def generate_response(request):
     prompt = request.data.get("prompt", "")
     user_id = request.data.get("user_id")
     mode = request.data.get("mode", "none")
+    orientations=request.data.get("orientations", "hetero")
     if not prompt:
         return Response({"error": "Prompt is required"}, status=400)
     if not user_id:
@@ -57,6 +67,21 @@ def generate_response(request):
             system = modes["none"]
         case _:
             system = modes["none"]
+
+    orientation = orientations["hetero"]
+    match orientations:
+        case "hetero":
+            orientation = orientations["hetero"]
+        case "homo":
+            orientation=orientations["homo"]
+        case "pan":
+            orientation=orientations["pan"]
+        case "aseks":
+            orientation=orientations["aseks"]
+        case "bi":
+            orientation=orientations['bi']
+        case _:
+            orientation=orientations['hetero']
 
     payload = {
         "model": "gemma3:4b-it-q4_K_M",
