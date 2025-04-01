@@ -86,7 +86,7 @@ def generate_response(request):
     payload = {
         "model": "gemma3:4b-it-q4_K_M",
         "prompt": prompt,
-        "system": system,
+        "system": system + orientation,
         "stream": stream_response,
         "temperature": 0.9,
         "context": [],
