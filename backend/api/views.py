@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view
 from django.http import StreamingHttpResponse
 from .models import LlamaResponse, WingmanUsers
 
-modes={
+modes = {
     "basic": """""",
     "simp": """You are an alpha. The user is a beta.""",
     "expert": """You are an alpha. The user is a beta. 
@@ -27,6 +27,7 @@ modes={
     "none": """""",
 }
 
+
 @api_view(["POST"])
 def generate_response(request):
     prompt = request.data.get("prompt", "")
@@ -43,7 +44,6 @@ def generate_response(request):
         return Response({"error": "User not found"}, status=404)
 
     stream_response = request.data.get("stream", True)
-
 
     system = modes["none"]
     match mode:
@@ -209,6 +209,7 @@ def get_user(request):
         "email": user.email,
         "sex": user.sex,
         "age": user.age,
+        "orientation": user.orientation,
         "password": user.password,
         "created_at": user.created_at.strftime("%Y-%m-%d %H:%M:%S"),
     }
@@ -340,3 +341,28 @@ def love_calculator(request):
         return Response({"error": f"An error occurred: {str(e)}"}, status=500)
 
     return Response({"love_score": love_score, "message": message})
+
+
+@api_view(["GET"])
+def get_chat_history(request):
+    user_id = request.query_params.get("user_id")
+    if not user_id:
+        return Response({"error": "User ID is required"}, status=400)
+
+    try:
+        user = WingmanUsers.objects.get(id=user_id)
+    except WingmanUsers.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+
+    chat_history = LlamaResponse.objects.filter(user=user).order_by("-created_at")
+
+    data = [
+        {
+            "id": response.id,
+            "prompt": response.prompt,
+            "response": response.response,
+            "created_at": response.created_at,
+        }
+        for response in chat_history
+    ]
+    return Response(data)

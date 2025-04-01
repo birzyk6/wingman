@@ -8,9 +8,7 @@ class WingmanUsers(models.Model):
     age = models.IntegerField()
     password = models.TextField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
-    orientation = models.TextField(max_length=100)
-
-
+    orientation = models.TextField(max_length=100, default="hetero")
 
     def __str__(self):
         return (
@@ -55,4 +53,3 @@ class LlamaChatWindow(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
-

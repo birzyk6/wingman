@@ -16,6 +16,7 @@ class Command(BaseCommand):
             "sex": "male",
             "age": 30,
             "password": make_password("test123"),
+            "orientation": "hetero",
         }
         WingmanUsers.objects.update_or_create(
             email=user_data["email"],
