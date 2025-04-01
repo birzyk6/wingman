@@ -15,8 +15,8 @@ export function ResponseDisplay({ response, streaming, error }: ResponseDisplayP
 
             {(response || streaming) && (
                 <div className="mt-6">
-                    <h2 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-2">Response:</h2>
-                    <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-md border border-gray-200 dark:border-gray-700 whitespace-pre-wrap dark:text-gray-200">
+                    <h2 className="text-lg font-medium text-zinc-800 dark:text-zinc-200 mb-2">Response:</h2>
+                    <div className="bg-zinc-50 dark:bg-zinc-700/50 p-4 rounded-md border border-zinc-200 dark:border-zinc-700 whitespace-pre-wrap dark:text-zinc-200">
                         {response}
                     </div>
                 </div>

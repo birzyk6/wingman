@@ -30,6 +30,9 @@ export default function LoginPage() {
             // Store user info (id, etc.) in local storage or context
             localStorage.setItem("wingmanUserId", data.id);
 
+            // Also set a cookie for middleware to use
+            document.cookie = `wingmanUserId=${data.id}; path=/; max-age=86400`;
+
             // Redirect to home page (or anywhere) after successful login
             router.push("/");
         } catch (err) {
