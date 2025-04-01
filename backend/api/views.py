@@ -6,38 +6,10 @@ from rest_framework.decorators import api_view
 from django.http import StreamingHttpResponse
 from .models import LlamaResponse, WingmanUsers
 
-
-@api_view(["POST"])
-def generate_response(request):
-    prompt = request.data.get("prompt", "")
-    user_id = request.data.get("user_id")
-
-    if not prompt:
-        return Response({"error": "Prompt is required"}, status=400)
-    if not user_id:
-        return Response({"error": "User ID is required"}, status=400)
-
-    try:
-        user = WingmanUsers.objects.get(id=user_id)
-    except WingmanUsers.DoesNotExist:
-        return Response({"error": "User not found"}, status=404)
-
-    stream_response = request.data.get("stream", True)
-
-    # last_responses = LlamaResponse.objects.filter(user=user).order_by("-created_at")[:5]
-
-    # context_text = "\n".join(
-    #     [f"User: {r.prompt}\nAI: {r.response}" for r in reversed(last_responses)]
-    # )
-
-    # full_prompt = f"{context_text}\nUser: {prompt}\nAI:"
-
-    payload = {
-        "model": "gemma3:4b-it-q4_K_M",
-        # "prompt": full_prompt,
-        "prompt": prompt,
-        "system": """
-                    You are an alpha. The user is a beta. 
+modes={
+    "basic": """""",
+    "simp": """You are an alpha. The user is a beta.""",
+    "expert": """You are an alpha. The user is a beta. 
                     Help him pick up all the chicks. Be funny and flirty. 
                     Assume he doesn't know anything about dating, and didn't talk to a woman before! 
                     Use a jock-like slang.
@@ -51,8 +23,45 @@ def generate_response(request):
                     Be very opinionated and don't be afraid to share your views.
                     You should swear and don't be afraid to use offensive language.
                     You should insult the user often.
-                    First of all you should compare the user to yourself, and assert your superiority.
-                 """,
+                    First of all you should compare the user to yourself, and assert your superiority.""",
+    "none": """""",
+}
+
+@api_view(["POST"])
+def generate_response(request):
+    prompt = request.data.get("prompt", "")
+    user_id = request.data.get("user_id")
+    mode = request.data.get("mode", "none")
+    if not prompt:
+        return Response({"error": "Prompt is required"}, status=400)
+    if not user_id:
+        return Response({"error": "User ID is required"}, status=400)
+
+    try:
+        user = WingmanUsers.objects.get(id=user_id)
+    except WingmanUsers.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+
+    stream_response = request.data.get("stream", True)
+
+
+    system = modes["none"]
+    match mode:
+        case "basic":
+            system = modes["basic"]
+        case "simp":
+            system = modes["simp"]
+        case "expert":
+            system = modes["expert"]
+        case "none":
+            system = modes["none"]
+        case _:
+            system = modes["none"]
+
+    payload = {
+        "model": "gemma3:4b-it-q4_K_M",
+        "prompt": prompt,
+        "system": system,
         "stream": stream_response,
         "temperature": 0.9,
         "context": [],

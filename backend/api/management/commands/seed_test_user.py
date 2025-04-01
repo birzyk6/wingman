@@ -1,5 +1,5 @@
 #### python
-# filepath: c:\Users\birzy\Desktop\wingman\backend\api\management\commands\seed_test_user.py
+
 from django.core.management.base import BaseCommand
 from django.contrib.auth.hashers import make_password
 from api.models import WingmanUsers
