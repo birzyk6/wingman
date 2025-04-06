@@ -149,6 +149,10 @@ You can also use the version with 1B parameters. It is downloaded by default wit
 
 -   **Gemma 3 (1B)** - Quantized model for efficient local chat responses
 
+### IMPORTANT
+
+If you want to use the model with 1B parameters, or any other model change the model used in each request in `views.py` to preffered model.
+
 ## 📱 Screenshots
 
 <div align="center">
