@@ -162,7 +162,7 @@ Wingman runs locally on your machine, ensuring your dating conversations and per
 
 ## 👥 Project Contributors
 
--   [Bartosz Irzyk](https://github.com/birzyk6) - DevOps / Backend / Frontend / Project manager
+-   [Bartosz Irzyk](https://github.com/birzyk6) - DevOps / Backend / Frontend / Project Designer
 -   [Kamil Derenda](https://github.com/kamilderenda) - Backend
 -   [Gerard Miętek](https://github.com/gerardmietek) - Backend
 -   [Zuzanna Gawlas](https://github.com/ZuzannaGawlas) - Frontend
