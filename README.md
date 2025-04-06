@@ -71,11 +71,6 @@ docker-compose up
 
 1. Clone the repository
 
-```bash
-git clone https://github.com/yourusername/wingman.git
-cd wingman
-```
-
 2. Install frontend dependencies
 
 ```bash
@@ -145,7 +140,7 @@ You can customize the Ollama model by editing the `docker-compose.yml` file:
 -   **Django** - Python web framework
 -   **Django REST Framework** - REST API framework
 -   **Ollama** - Local LLM integration
--   **SQLite** - Database (for development)
+-   **Postgresql** - Database
 
 ### AI Models
 
