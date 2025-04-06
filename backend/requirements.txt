@@ -1,0 +1,29 @@
+# Django and REST framework
+Django==5.1.0
+djangorestframework==3.15.0
+
+# Database
+psycopg2-binary==2.9.9  # PostgreSQL adapter
+
+# CORS support
+django-cors-headers==4.4.0
+
+# Request handling
+requests==2.31.0
+
+# Environment variables
+python-dotenv==1.0.1
+
+# Server
+gunicorn==22.0.0
+
+# JSON handling
+jsonschema==4.21.1
+
+# Development tools
+black==24.3.0  # Code formatter
+isort==5.13.0  # Import sorter
+flake8==7.0.0  # Linter
+
+# Production dependencies
+whitenoise==6.6.0  # Serving static files
