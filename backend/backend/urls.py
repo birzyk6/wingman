@@ -25,4 +25,11 @@ urlpatterns = [
     path("api/get_user/", get_user),
     path("api/login_user/", login_user),
     path("api/love_calculator/", love_calculator),
+    path("api/chat_history/", get_chat_history),
+    path("api/chat_windows/", get_all_chat_windows),
+    path("api/chat_windows/create/", create_chat_window),
+    path("api/chat_windows/<int:chat_id>/delete/", delete_chat_window),
+    path("api/tinder_replies/", tinder_replies),
+    path("api/tinder_description/", tinder_description),  # Add new endpoint
+    path("api/update_user/", update_user),
 ]

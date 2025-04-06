@@ -5,3 +5,57 @@
 .btn {
     @apply bg-zinc-100 hover:bg-zinc-200 text-black dark:bg-zinc-800 dark:hover:bg-zinc-950 dark:text-white items-center cursor-pointer justify-items-center rounded-lg transition-colors;
 }
+
+/* Add a global style for buttons */
+button {
+    @apply cursor-pointer;
+}
+
+/* Except for disabled buttons */
+button:disabled {
+    @apply cursor-not-allowed;
+}
+
+/* Add these styles to your existing CSS */
+
+.markdown-content {
+    /* Common styling for all markdown content */
+    word-break: break-word;
+}
+
+.markdown-content code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.markdown-content pre {
+    margin: 0; /* Fixes double margin in pre+code blocks */
+}
+
+.markdown-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.25rem;
+}
+
+.markdown-content a {
+    text-decoration: none;
+}
+
+.markdown-content hr {
+    border: 0;
+    height: 1px;
+    background-color: #d1d5db;
+    margin: 1rem 0;
+}
+
+.dark .markdown-content hr {
+    background-color: #4b5563;
+}
+
+/* Syntax highlighting */
+.markdown-content pre code {
+    display: block;
+    width: 100%;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
