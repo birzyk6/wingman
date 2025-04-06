@@ -119,7 +119,7 @@ The Docker Compose file included in this project **only sets up the dependencies
 -   PostgreSQL database
 -   Ollama server with Gemma model
 
-It does **not** run the Django backend or Next.js frontend. This approach gives you more flexibility during development while still providing consistent dependency services.
+It does **not** run the Django backend or Next.js frontend. This approach gave us more flexibility during development.
 
 You can customize the Ollama model by editing the `docker-compose.yml` file:
 
@@ -127,24 +127,27 @@ You can customize the Ollama model by editing the `docker-compose.yml` file:
 
 ### Frontend
 
--   **Next.js 15** - React framework with App Router
--   **React 19** - UI library
--   **TypeScript** - Type checking
--   **TailwindCSS 4** - Utility-first CSS
--   **Framer Motion** - Animations
--   **Lucide React** - Icons
--   **React Markdown** - Markdown rendering
+-   **Next.js**
+-   **TypeScript**
+-   **TailwindCSS 4**
+-   **Framer Motion**
+-   **Lucide React**
+-   **React Markdown**
 
 ### Backend
 
--   **Django** - Python web framework
--   **Django REST Framework** - REST API framework
--   **Ollama** - Local LLM integration
--   **Postgresql** - Database
+-   **Django**
+-   **Django REST Framework**
+-   **Ollama**
+-   **Postgresql**
 
 ### AI Models
 
 -   **Gemma 3 (4B)** - Quantized model for efficient local chat responses
+
+You can also use the version with 1B parameters. It is downloaded by default with `docker-compose.yml`
+
+-   **Gemma 3 (1B)** - Quantized model for efficient local chat responses
 
 ## 📱 Screenshots
 
@@ -159,12 +162,12 @@ Wingman runs locally on your machine, ensuring your dating conversations and per
 
 ## 👥 Project Contributors
 
--   [Bartosz Irzyk](https://github.com/birzyk6)
--   [Kamil Derenda](https://github.com/kamilderenda)
--   [Gerard Miętek](https://github.com/gerardmietek)
--   [Zuzanna Gawlas](https://github.com/ZuzannaGawlas)
--   [Julita Skorzycka](https://github.com/JulitaSkorzycka)
--   [Marcin Samojluk](https://github.com/Nicram123)
+-   [Bartosz Irzyk](https://github.com/birzyk6) - DevOps / Backend / Frontend / Lead
+-   [Kamil Derenda](https://github.com/kamilderenda) - Backend
+-   [Gerard Miętek](https://github.com/gerardmietek) - Backend
+-   [Zuzanna Gawlas](https://github.com/ZuzannaGawlas) - Frontend
+-   [Julita Skorzycka](https://github.com/JulitaSkorzycka) - Frontend
+-   [Marcin Samojluk](https://github.com/Nicram123) - Backend / Frontend
 
 ## 📄 License
 
