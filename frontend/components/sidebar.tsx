@@ -4,15 +4,22 @@ import { ResponseData } from "@/services/api";
 import { useState, useEffect, useRef } from "react";
 import { ThemeToggle } from "./theme-toggle";
 import UserAvatar from "./user-avatar";
-import { Heart, MessageSquare, User, Users } from "lucide-react";
+import { Heart, MessageSquare, User, Users, Plus, Trash2, RefreshCw, Info } from "lucide-react";
+import Link from "next/link";
 
-// Update the SidebarProps interface to include onOptionSelect
+// Update SidebarProps interface - remove the chat mode related props
 interface SidebarProps {
     previousResponses: ResponseData[];
     fetchingHistory: boolean;
     onSelectResponse: (response: ResponseData) => void;
-    onOptionSelect: (option: string) => void; // New prop for option selection
-    selectedOption: string | null; // Currently selected option
+    onOptionSelect: (option: string) => void;
+    selectedOption: string | null;
+    chatWindows?: any[];
+    onSelectChatWindow?: (chatWindow: any) => void;
+    onCreateChat?: () => void;
+    onDeleteChat?: (chatId: number) => void;
+    onRefresh?: () => void;
+    generatingChats?: Record<number, boolean>;
 }
 
 export function Sidebar({
@@ -21,8 +28,14 @@ export function Sidebar({
     onSelectResponse,
     onOptionSelect,
     selectedOption,
+    chatWindows = [],
+    onSelectChatWindow = () => {},
+    onCreateChat = () => {},
+    onDeleteChat = () => {},
+    onRefresh = () => {},
+    generatingChats = {},
 }: SidebarProps) {
-    const [width, setWidth] = useState(256);
+    const [width, setWidth] = useState(300);
     const [isResizing, setIsResizing] = useState(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -71,7 +84,7 @@ export function Sidebar({
             const newWidth = e.clientX;
 
             // Set min and max constraints
-            if (newWidth >= 200 && newWidth <= 600) {
+            if (newWidth >= 300 && newWidth <= 600) {
                 setWidth(newWidth);
             }
         };
@@ -81,7 +94,7 @@ export function Sidebar({
 
             const newWidth = e.touches[0].clientX;
 
-            if (newWidth >= 200 && newWidth <= 600) {
+            if (newWidth >= 300 && newWidth <= 600) {
                 setWidth(newWidth);
             }
         };
@@ -148,6 +161,9 @@ export function Sidebar({
         onOptionSelect(option);
     };
 
+    // Keep the chat container ref but remove button-related states
+    const chatContainerRef = useRef<HTMLDivElement>(null);
+
     return (
         <div
             ref={sidebarRef}
@@ -158,6 +174,19 @@ export function Sidebar({
                 <div className="flex items-center justify-between">
                     <UserAvatar />
                     <div className="flex flex-row items-center space-x-2">
+                        {/* Add Welcome Screen button */}
+                        <button
+                            onClick={() => handleOptionSelect("welcome")}
+                            className={`p-2 rounded-md ${
+                                selectedOption === "welcome"
+                                    ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                                    : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                            }`}
+                            title="About Wingman"
+                        >
+                            <Info className="w-5 h-5" />
+                        </button>
+
                         <ThemeToggle />
                     </div>
                 </div>
@@ -184,34 +213,6 @@ export function Sidebar({
                     <button
                         className={`flex items-center justify-between cursor-pointer space-x-2 px-2 h-10 
                             ${
-                                selectedOption === "reply-help"
-                                    ? "bg-blue-500 dark:bg-blue-900 text-white"
-                                    : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700"
-                            } 
-                            rounded-lg transition-colors`}
-                        onClick={() => handleOptionSelect("reply-help")}
-                    >
-                        <span className="text-sm">Trouble with replying?</span>
-                        <MessageSquare className="w-4 h-4" />
-                    </button>
-
-                    <button
-                        className={`flex items-center justify-between cursor-pointer space-x-2 px-2 h-10 
-                            ${
-                                selectedOption === "describe-yourself"
-                                    ? "bg-green-500 dark:bg-green-900 text-white"
-                                    : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700"
-                            } 
-                            rounded-lg transition-colors`}
-                        onClick={() => handleOptionSelect("describe-yourself")}
-                    >
-                        <span className="text-sm">Describe yourself</span>
-                        <User className="w-4 h-4" />
-                    </button>
-
-                    <button
-                        className={`flex items-center justify-between cursor-pointer space-x-2 px-2 h-10 
-                            ${
                                 selectedOption === "dating-help"
                                     ? "bg-purple-500 dark:bg-purple-900 text-white"
                                     : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700"
@@ -219,13 +220,199 @@ export function Sidebar({
                             rounded-lg transition-colors`}
                         onClick={() => handleOptionSelect("dating-help")}
                     >
-                        <span className="text-sm">Dating help</span>
+                        <span className="text-sm">Help with replies</span>
                         <Users className="w-4 h-4" />
+                    </button>
+
+                    <button
+                        className={`flex items-center justify-between cursor-pointer space-x-2 px-2 h-10 
+                            ${
+                                selectedOption === "reply-help"
+                                    ? "bg-blue-500 dark:bg-blue-900 text-white"
+                                    : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                            } 
+                            rounded-lg transition-colors`}
+                        onClick={() => handleOptionSelect("reply-help")}
+                    >
+                        <span className="text-sm">Dating help</span>
+                        <MessageSquare className="w-4 h-4" />
+                    </button>
+
+                    {/* Add new button for Tinder profile descriptions */}
+                    <button
+                        className={`flex items-center justify-between cursor-pointer space-x-2 px-2 h-10 
+                            ${
+                                selectedOption === "profile-description"
+                                    ? "bg-green-500 dark:bg-green-900 text-white"
+                                    : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                            } 
+                            rounded-lg transition-colors`}
+                        onClick={() => handleOptionSelect("profile-description")}
+                    >
+                        <span className="text-sm">Tinder Bio Creator</span>
+                        <User className="w-4 h-4" />
                     </button>
                 </div>
             </div>
 
-            {/* Apply RTL to container to move scrollbar left with transparent styling */}
+            {/* Chat Windows Section - Modified to remove scroll buttons */}
+            <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
+                <div className="flex justify-between items-center mb-2">
+                    <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Your Conversations</h2>
+                    <div className="flex gap-1">
+                        <button
+                            onClick={onRefresh}
+                            className="p-1 cursor-pointer rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400"
+                            title="Refresh Chats"
+                        >
+                            <RefreshCw className="h-4 w-4" />
+                        </button>
+                        <button
+                            onClick={onCreateChat}
+                            className="p-1 rounded-md cursor-pointer hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400"
+                            title="New Chat"
+                        >
+                            <Plus className="h-4 w-4" />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Scrollable container for chats - Keep this part */}
+                <div
+                    ref={chatContainerRef}
+                    className="flex flex-col space-y-2 mt-4 h-64 overflow-y-auto pr-1 relative scrollbar-thin"
+                    style={{
+                        scrollbarWidth: "thin",
+                        scrollbarColor: "rgba(156, 163, 175, 0.5) transparent",
+                    }}
+                >
+                    {fetchingHistory ? (
+                        <div className="text-sm text-zinc-500 dark:text-zinc-400 p-2 flex items-center">
+                            <div className="animate-spin h-4 w-4 mr-2 border-2 border-zinc-500 border-t-transparent rounded-full"></div>
+                            Loading chats...
+                        </div>
+                    ) : chatWindows.length === 0 ? (
+                        <div className="text-sm text-zinc-500 dark:text-zinc-400 p-2">
+                            <p>No conversations yet</p>
+                            <button onClick={onCreateChat} className="mt-2 text-blue-500 flex items-center">
+                                <Plus className="h-3 w-3 mr-1" /> Start a new chat
+                            </button>
+                        </div>
+                    ) : (
+                        chatWindows.map((chat, index) => {
+                            // Find the most recent message to use as title
+                            let chatTitle = `Chat ${index + 1}`;
+                            let latestTime = null;
+
+                            if (chat && chat.responses && Array.isArray(chat.responses) && chat.responses.length > 0) {
+                                try {
+                                    // Create a shallow copy of the responses array to avoid mutation issues
+                                    const responsesCopy = chat.responses.slice();
+
+                                    // Sort responses by date (newest first) with additional error checks
+                                    const sortedResponses = responsesCopy.sort(
+                                        (
+                                            a: { created_at: string | number | Date },
+                                            b: { created_at: string | number | Date }
+                                        ) => {
+                                            try {
+                                                const dateA = a && a.created_at ? new Date(a.created_at).getTime() : 0;
+                                                const dateB = b && b.created_at ? new Date(b.created_at).getTime() : 0;
+                                                return dateB - dateA;
+                                            } catch (err) {
+                                                // If date parsing fails, maintain original order
+                                                return 0;
+                                            }
+                                        }
+                                    );
+
+                                    // Use the latest prompt as the title with additional null checks
+                                    const latestResponse = sortedResponses[0];
+                                    if (latestResponse && typeof latestResponse === "object" && latestResponse.prompt) {
+                                        chatTitle =
+                                            typeof latestResponse.prompt === "string"
+                                                ? latestResponse.prompt.length > 25
+                                                    ? latestResponse.prompt.substring(0, 25) + "..."
+                                                    : latestResponse.prompt
+                                                : `Chat ${index + 1}`;
+
+                                        // Only create Date object if created_at is valid
+                                        if (latestResponse.created_at) {
+                                            try {
+                                                latestTime = new Date(latestResponse.created_at);
+                                                // Verify the date is valid
+                                                if (isNaN(latestTime.getTime())) {
+                                                    latestTime = null;
+                                                }
+                                            } catch (e) {
+                                                latestTime = null;
+                                            }
+                                        }
+                                    }
+                                } catch (error) {
+                                    console.error("Error processing chat responses:", error);
+                                    // Fallback to default title if there's an error
+                                }
+                            }
+
+                            // Safely check if the chat is generating - ensure chat.id exists and is not null
+                            const isGenerating =
+                                chat &&
+                                chat.id !== undefined &&
+                                chat.id !== null &&
+                                Object.prototype.hasOwnProperty.call(generatingChats, chat.id) &&
+                                generatingChats[chat.id] === true;
+
+                            return (
+                                <div
+                                    key={chat.id || index}
+                                    className="flex items-center bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg transition-colors"
+                                >
+                                    <button
+                                        className="flex flex-1 items-center justify-between cursor-pointer space-x-2 px-2 py-2 text-left"
+                                        onClick={() => onSelectChatWindow(chat)}
+                                    >
+                                        <div className="flex flex-col overflow-hidden">
+                                            <div className="flex items-center">
+                                                <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                                                    {chatTitle}
+                                                </span>
+                                                {isGenerating && (
+                                                    <div className="ml-2 h-2 w-2 bg-blue-500 rounded-full animate-pulse"></div>
+                                                )}
+                                            </div>
+                                            {latestTime && (
+                                                <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                                                    {latestTime.toLocaleDateString()}{" "}
+                                                    {latestTime.toLocaleTimeString([], {
+                                                        hour: "2-digit",
+                                                        minute: "2-digit",
+                                                    })}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <MessageSquare className="w-4 h-4 text-zinc-400 shrink-0" />
+                                    </button>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (window.confirm("Are you sure you want to delete this chat?")) {
+                                                onDeleteChat(chat.id);
+                                            }
+                                        }}
+                                        className="p-2 ml-1 cursor-pointer text-zinc-400 hover:text-red-500 dark:hover:text-red-400"
+                                        title="Delete chat"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            );
+                        })
+                    )}
+                </div>
+            </div>
+
+            {/* Apply RTL styling for scrollbar */}
             <div
                 className="overflow-y-auto flex-1 scrollbar-custom"
                 style={{
@@ -233,33 +420,11 @@ export function Sidebar({
                     ...(isDarkMode ? darkScrollbarStyles : scrollbarStyles),
                 }}
             >
-                {/* Apply LTR to content to maintain correct text direction
-                <div style={{ direction: "ltr" }}>
-                    {fetchingHistory ? (
-                        <div className="p-4 text-center text-zinc-500 dark:text-zinc-400">Loading history...</div>
-                    ) : previousResponses.length === 0 ? (
-                        <div className="p-4 text-center text-zinc-500 dark:text-zinc-400">No previous responses</div>
-                    ) : (
-                        <ul className="divide-y divide-zinc-200 dark:divide-zinc-700">
-                            {previousResponses.map((item) => (
-                                <li key={item.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-700 cursor-pointer">
-                                    <button onClick={() => onSelectResponse(item)} className="p-4 w-full text-left">
-                                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
-                                            {item.prompt.length > 30
-                                                ? item.prompt.substring(0, 30) + "..."
-                                                : item.prompt}
-                                        </p>
-                                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                                            {new Date(item.created_at).toLocaleString()}
-                                        </p>
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div> */}
+                {/* This div is kept empty - we're no longer showing previous responses here */}
+                <div style={{ direction: "ltr" }}></div>
             </div>
-            {/* Improved resize handle */}
+
+            {/* Resize handle */}
             <div
                 className={`absolute top-0 right-0 w-2 h-full cursor-ew-resize flex items-center justify-center ${
                     isResizing ? "bg-blue-200 dark:bg-zinc-500" : "hover:bg-zinc-200 dark:hover:bg-zinc-700"
@@ -267,9 +432,7 @@ export function Sidebar({
                 onMouseDown={handleMouseDown}
                 onTouchStart={handleTouchStart}
                 aria-label="Resize sidebar"
-            >
-                <div className="w-1 right-10 h-16 rounded-full bg-zinc-300 dark:bg-zinc-600"></div>
-            </div>
+            ></div>
         </div>
     );
 }

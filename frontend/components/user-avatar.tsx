@@ -53,17 +53,9 @@ const UserAvatar = () => {
         setIsDropdownOpen(!isDropdownOpen);
     };
 
-    // Safe logout function
-    const handleLogout = () => {
-        if (typeof window !== "undefined") {
-            localStorage.removeItem("user_id");
-            window.location.href = "/login";
-        }
-    };
-
     return (
         <div className="relative" ref={dropdownRef}>
-            <button className="flex btn items-center space-x-2 px-2 h-10" onClick={toggleDropdown}>
+            <button className="flex btn items-center space-x-2 px-2 h-10 cursor-pointer" onClick={toggleDropdown}>
                 <User className="h-5 w-5 text-zinc-800 dark:text-zinc-100" />
                 {loading ? (
                     <div className="h-4 w-24 bg-zinc-200 dark:bg-zinc-700 rounded animate-pulse"></div>

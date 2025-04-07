@@ -4,9 +4,9 @@ from .models import LlamaResponse, WingmanUsers, LlamaChatWindow
 
 @admin.register(WingmanUsers)
 class WingmanUsersAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "email", "sex", "age", "created_at")
+    list_display = ("id", "name", "email", "sex", "age", "orientation", "created_at")
     search_fields = ("name", "email")
-    list_filter = ("created_at", "sex")
+    list_filter = ("created_at", "sex", "orientation")
     readonly_fields = ("created_at",)
 
 
@@ -33,4 +33,3 @@ class LlamaChatWindowAdmin(admin.ModelAdmin):
     search_fields = ("user",)
     list_filter = ("created_at",)
     readonly_fields = ("created_at",)
-
