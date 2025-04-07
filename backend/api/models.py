@@ -8,7 +8,7 @@ class WingmanUsers(models.Model):
     age = models.IntegerField()
     password = models.TextField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
-    orientation = models.TextField(max_length=100)
+    orientation = models.TextField(max_length=100, null=True)
 
 
 
